@@ -1,58 +1,73 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# LabActivity10-Palparan
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Barangay Bulletin for Lab Activity 10 (Full-Stack Web Development, 4-334).
+A small blog where barangay officials post announcements and residents can
+browse, search and page through them. Built with Laravel 12, SQLite, Blade
+and Tailwind.
 
-## About Laravel
+## My personalization
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Site title:** Barangay Bulletin – Purok Palparan
+- **Posts per page: 8.** My last name is Palparan, which has 8 letters, so
+  `paginate(8)` in `PostController@index`.
+- **My custom category: Lost & Found.** I added it to the four required ones
+  (Announcement, Health, Peace & Order, Ayuda) because residents here usually
+  post about lost pets and misplaced IDs on the actual cork board.
+- **My author:** Kagawad Luis Palparan, kagawad.palparan@bulletin.test,
+  created by hand with `Author::create()` in `AuthorSeeder`.
+- **My pinned post:** "Purok Palparan Clean-up Drive", published
+  **2026-03-12** (my birthday), written with `Post::create()` in `PostSeeder`.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## What the seeders make
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- 5 authors (my Kagawad + 4 from `AuthorFactory`)
+- 51 posts total: 40 published from the factory, 10 drafts using the
+  `draft()` state, plus my pinned post
+- 41 of those are published, which is what the list page pages through
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## How to run it
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate:fresh --seed
+npm install
+npm run dev
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+The database is SQLite. If `database/database.sqlite` is missing, make it
+first with `touch database/database.sqlite` (PowerShell:
+`New-Item database/database.sqlite`).
 
-## Contributing
+Keep `npm run dev` running in one terminal and `php artisan serve` in
+another, then open http://127.0.0.1:8000 which redirects to /posts.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Migrations
 
-## Code of Conduct
+Three of my own, in this order:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+1. `create_authors_table`
+2. `create_posts_table` (has the `foreignId('author_id')->constrained()`)
+3. `add_views_to_posts_table` (separate alter migration using
+   `Schema::table`, so the posts migration never had a views column)
 
-## Security Vulnerabilities
+All three have a working `down()`. I tested it with
+`php artisan migrate:rollback` then `php artisan migrate` again.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Pages
 
-## License
+- `/posts` - published posts only, pinned first then newest. Search by title
+  with `?q=` and filter by category with `?category=`. Both are only applied
+  when filled. Pagination keeps the filters with `withQueryString()`.
+- `/posts/{id}` - one post, uses `findOrFail`. Drafts return 404 because the
+  query filters to published first. Each visit adds 1 to `views` and calls
+  `save()`.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Notes
+
+`docs/tinker.png` is the screenshot of the find → change title → save → read
+back cycle from Step 13.
+
+`vendor/`, `node_modules/` and `database/database.sqlite` are not committed.
