@@ -4,31 +4,53 @@
 
 @section('content')
 
-    <a href="{{ route('posts.index') }}" class="text-sm text-blue-700 hover:underline">
-        &larr; Back to all posts
-    </a>
+@php
+    $ink = [
+        'Announcement'  => 'text-[#2F6B4F]',
+        'Health'        => 'text-[#A33A3A]',
+        'Peace & Order' => 'text-[#2C4A7C]',
+        'Ayuda'         => 'text-[#B07D0F]',
+        'Lost & Found'  => 'text-[#6B3F72]',
+    ];
+    $edge = [
+        'Announcement'  => 'border-l-[#2F6B4F]',
+        'Health'        => 'border-l-[#A33A3A]',
+        'Peace & Order' => 'border-l-[#2C4A7C]',
+        'Ayuda'         => 'border-l-[#B07D0F]',
+        'Lost & Found'  => 'border-l-[#6B3F72]',
+    ];
+@endphp
 
-    <article class="mt-4 rounded bg-white p-5 shadow sm:p-8">
+<a href="{{ route('posts.index') }}"
+   class="inline-block border-b border-[#1F4D3A] pb-0.5 text-[14px] font-medium text-[#1F4D3A]">
+    Bumalik sa lahat ng abiso
+</a>
 
-        @if ($post->is_pinned)
-            <span class="inline-block rounded bg-amber-200 px-2 py-1 text-xs font-semibold text-amber-900">
-                Pinned
-            </span>
-        @endif
+<article class="mt-6 border-l-[6px] bg-white px-6 py-8 sm:px-12 sm:py-12
+                {{ $post->is_pinned ? 'border-l-[#C9A227]' : ($edge[$post->category] ?? 'border-l-[#CFC7B2]') }}">
 
-        <h1 class="mt-2 text-2xl font-bold sm:text-3xl">{{ $post->title }}</h1>
+    @if ($post->is_pinned)
+        <p class="text-[13px] font-medium text-[#8A6E12]">Nakapaskil sa board</p>
+    @endif
 
-        <p class="mt-2 text-sm text-slate-500">
-            <span class="rounded bg-slate-200 px-2 py-1">{{ $post->category }}</span>
-            &middot; {{ $post->published_at->format('M d, Y') }}
-            &middot; {{ $post->views }} views
-            &middot; Author #{{ $post->author_id }}
-        </p>
+    <p class="mt-1 text-[13px] font-medium {{ $ink[$post->category] ?? 'text-[#4A463C]' }}">
+        {{ $post->category }}
+    </p>
 
-        <div class="mt-5 whitespace-pre-line leading-relaxed">
-            {{ $post->body }}
-        </div>
+    <h1 class="mt-3 max-w-[24ch] text-[30px] font-semibold leading-[1.12] sm:text-[42px]">
+        {{ $post->title }}
+    </h1>
 
-    </article>
+    <div class="mt-5 flex flex-wrap gap-x-8 gap-y-2 border-y border-[#EFEAD9] py-4 text-[13px] text-[#7A7465]">
+        <span>Inilathala {{ $post->published_at->format('j F Y') }}</span>
+        <span>{{ $post->views }} nabasa</span>
+        <span>Opisyal #{{ $post->author_id }}</span>
+    </div>
+
+    <div class="mt-7 max-w-[66ch] whitespace-pre-line text-[17px] leading-[1.75] text-[#3A362D]">
+        {{ $post->body }}
+    </div>
+
+</article>
 
 @endsection
